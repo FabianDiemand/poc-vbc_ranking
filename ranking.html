@@ -10,65 +10,32 @@
   <script type='text/javascript'>
     const parser = new DOMParser();
 
+    // Content (re)loaded w.e. the page gets loaded
+    window.onload = function () {
+      soap();
+    };
 
+    // Main method to send the request and handle the response
+    // TODO: ErrorHandling!!!
     function soap() {
       const xml = new XMLHttpRequest();
       xml.open('POST', 'https://myvolley.volleyball.ch/svserver.php', true);
       var strRequest = createRequestString('<mns:getTable xmlns:mns="https://myvolley.volleyball.ch" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><group_ID xsi:type="xsd:int">13965</group_ID></mns:getTable>');
 
-      //specify request headers
       xml.setRequestHeader('Content-Type', 'text/xml');
       xml.setRequestHeader('SOAPAction', '');
 
-      //FOR TESTING: display results in an alert box once the response is received
       xml.onreadystatechange = function () {
         if (xml.readyState == 4) {
-          console.log(parser.parseFromString(xml.responseText, 'text/xml'))
-          extractData(xml.responseXML);
           displayData(extractData(xml.responseXML));
         }
       };
 
-      //send the SOAP request
       xml.send(strRequest);
     };
 
-    //build & send the request when the page loads
-    window.onload = function () {
-      soap();
-    };
-
-    function displayData(dataArray) {
-      const table = document.getElementById('table');
-      const data = Object.keys(dataArray[0]);
-      createRankingTableHead(table, data);
-      createRankingTableBody(table, dataArray)
-    }
-
-    function createRankingTableHead(table, data) {
-      let thead = table.createTHead();
-      let row = thead.insertRow();
-
-      for (let key of data) {
-        let th = document.createElement('th');
-        let text = document.createTextNode(key);
-        th.appendChild(text);
-        row.appendChild(th);
-      }
-    }
-
-    function createRankingTableBody(table, data) {
-      for (let element of data) {
-        let row = table.insertRow();
-
-        for (key in element) {
-          let cell = row.insertCell();
-          let text = document.createTextNode(element[key]);
-          cell.appendChild(text);
-        }
-      }
-    }
-
+    // FOR DEVELOPMENT: create different requests
+    // TODO: To be replaced by a static request as soon as staged on website!
     function createRequestString(request) {
       return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
         + '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typens="https://myvolley.volleyball.ch" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >'
@@ -78,7 +45,7 @@
         + '</SOAP-ENV:Envelope>'
     }
 
-
+    // Extracts the required data from the xml response body
     function extractData(data) {
       const ranking = [];
       var numOfEntries = data.getElementsByTagName('item').length;
@@ -92,8 +59,41 @@
         })
       }
 
-      //console.log(ranking);
       return ranking;
+    }
+
+    // Controls table creation
+    function displayData(dataArray) {
+      const table = document.getElementById('table');
+      const data = Object.keys(dataArray[0]);
+      createRankingTableHead(table, data);
+      createRankingTableBody(table, dataArray)
+    }
+
+    // Creates table head, using the keys from the data-json-object
+    function createRankingTableHead(table, data) {
+      let thead = table.createTHead();
+      let row = thead.insertRow();
+
+      for (let key of data) {
+        let th = document.createElement('th');
+        let text = document.createTextNode(key);
+        th.appendChild(text);
+        row.appendChild(th);
+      }
+    }
+
+    // Creates table body
+    function createRankingTableBody(table, data) {
+      for (let element of data) {
+        let row = table.insertRow();
+
+        for (key in element) {
+          let cell = row.insertCell();
+          let text = document.createTextNode(element[key]);
+          cell.appendChild(text);
+        }
+      }
     }
   </script>
 </body>
