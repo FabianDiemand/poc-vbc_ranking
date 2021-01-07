@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset='UTF8'>
+  <title>Ranking</title>
+</head>
+
+<body>
+  <div id='buttons'>
+    <input type='button' id='hnlb' value='HNLB' style='margin-bottom: 10px' />
+    <input type='button' id='h1l' value='H1L' />
+    <input type='button' id='h2l' value='H2L' />
+    <input type='button' id='h3l' value='H3L' />
+    <input type='button' id='h4l' value='H4L' />
+    <input type='button' id='d1l' value='D1L' />
+    <input type='button' id='d2l' value='D2L' />
+    <input type='button' id='d3l' value='D3L' />
+    <input type='button' id='d4l' value='D4L' />
+    <input type='button' id='d5l' value='D5L' />
+  </div>
+  <div id='tableContainer'></div>
+
+
+  <script>
+    // Content (re)loaded w.e. the page gets loaded
+
+    document.getElementById('hnlb').addEventListener('click', () => fetchTableData(13882));
+    document.getElementById('h1l').addEventListener('click', () => fetchTableData(13931));
+    document.getElementById('h2l').addEventListener('click', () => fetchTableData(13965));
+    document.getElementById('h3l').addEventListener('click', () => fetchTableData(13993));
+    document.getElementById('h4l').addEventListener('click', () => fetchTableData(13968));
+    document.getElementById('d1l').addEventListener('click', () => fetchTableData(13916));
+    document.getElementById('d2l').addEventListener('click', () => fetchTableData(13976));
+    document.getElementById('d3l').addEventListener('click', () => fetchTableData(13959));
+    document.getElementById('d4l').addEventListener('click', () => fetchTableData(13958));
+    document.getElementById('d5l').addEventListener('click', () => fetchTableData(13976));
+    window.addEventListener('load', () => fetchTableData(13965));
+    // Main method to send the request and handle the response
+    // TODO: ErrorHandling!!!
+    function fetchTableData(groupID) {
+      const xml = new XMLHttpRequest();
+      xml.open('POST', 'https://myvolley.volleyball.ch/svserver.php', true);
+      var strRequest = createTableRequestString(groupID);
+
+      xml.setRequestHeader('Content-Type', 'text/xml');
+      xml.setRequestHeader('SOAPAction', '');
+
+      xml.onreadystatechange = function () {
+        if (xml.readyState == 4) {
+          displayTableData(extractTableData(xml.responseXML));
+        }
+      };
+
+      xml.send(strRequest);
+    };
+
+    // Create different requests
+    function createTableRequestString(groupId) {
+      return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+        + '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typens="https://myvolley.volleyball.ch" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >'
+        + '<SOAP-ENV:Body>'
+        + `<mns:getTable xmlns:mns="https://myvolley.volleyball.ch" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><group_ID xsi:type="xsd:int">${ groupId }</group_ID></mns:getTable>`
+        + '</SOAP-ENV:Body>'
+        + '</SOAP-ENV:Envelope>'
+    }
+
+    // Extracts the required data from the xml response body
+    function extractTableData(data) {
+      const ranking = [];
+      var numOfEntries = data.getElementsByTagName('item').length;
+      for (let i = 0; i < numOfEntries; i++) {
+        var entry = data.getElementsByTagName('item')[i];
+        ranking.push({
+          Rang: getTableContent(entry, 'Rank'),
+          Team: getTableContent(entry, 'Caption'),
+          Siege: getTableContent(entry, 'Wins'),
+          Niederlagen: getTableContent(entry, 'Defeats'),
+          Punkte: getTableContent(entry, 'Points'),
+        })
+      }
+
+      return ranking;
+    }
+
+    function getTableContent(element, key) {
+      return element.getElementsByTagName(`${ key }`)[0].textContent
+    }
+
+    // Controls table creation
+    function displayTableData(dataArray) {
+
+      if (document.getElementById('ranking')) {
+        let tmp = document.getElementById('ranking');
+        tmp.parentNode.removeChild(tmp);
+      }
+
+      const container = document.getElementById('tableContainer');
+      const table = document.createElement('table');
+      table.id = 'ranking';
+      container.append(table);
+
+      const data = Object.keys(dataArray[0]);
+      createRankingTableHead(table, data);
+      createRankingTableBody(table, dataArray)
+    }
+
+    // Creates table head, using the keys from the data-json-object
+    function createRankingTableHead(table, data) {
+      let thead = table.createTHead();
+      let row = thead.insertRow();
+
+
+      for (let key of data) {
+        let th = document.createElement('th');
+        let text = document.createTextNode(key);
+        th.appendChild(text);
+        row.appendChild(th);
+      }
+    }
+
+    // Creates table body
+    function createRankingTableBody(table, data) {
+      for (let element of data) {
+        let row = table.insertRow();
+
+        for (key in element) {
+          let cell = row.insertCell();
+          let text = document.createTextNode(element[key]);
+          cell.appendChild(text);
+        }
+      }
+    }
+  </script>
+  <!-- small version: use 'padding 3px 30px'-->
+  <!-- wide version: use 'padding 3px 65px'-->
+  <style>
+    #ranking {
+      border-spacing: 0px;
+    }
+
+    #ranking th,
+    #ranking td {
+      text-align: center;
+      padding: 3px 65px;
+      border-bottom: 1px solid rgb(180, 176, 176);
+    }
+
+    #ranking th {
+      background-color: rgb(246, 246, 246);
+    }
+  </style>
+</body>
