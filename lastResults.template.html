@@ -6,28 +6,25 @@
 </head>
 
 <body>
-  <table id='table'></table>
+  <table id='results'></table>
   <script>
-    const parser = new DOMParser();
 
     // Content (re)loaded w.e. the page gets loaded
-    window.onload = function () {
-      soap();
-    };
+    window.addEventListener('load', fetchResultData);
 
     // Main method to send the request and handle the response
     // TODO: ErrorHandling!!!
-    function soap() {
+    function fetchResultData() {
       const xml = new XMLHttpRequest();
       xml.open('POST', 'https://myvolley.volleyball.ch/svserver.php', true);
-      var strRequest = createRequestString(13882);
+      var strRequest = createResultRequestString(13882);
 
       xml.setRequestHeader('Content-Type', 'text/xml');
       xml.setRequestHeader('SOAPAction', '');
 
       xml.onreadystatechange = function () {
         if (xml.readyState == 4) {
-          displayData(extractData(xml.responseXML));
+          displayResultData(extractResultData(xml.responseXML));
         }
       };
 
@@ -35,8 +32,7 @@
     };
 
     // Create different requests
-    // TODO: To be replaced by a static request as soon as staged on website!
-    function createRequestString(groupId) {
+    function createResultRequestString(groupId) {
       return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
         + '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typens="https://myvolley.volleyball.ch" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >'
         + '<SOAP-ENV:Body>'
@@ -47,8 +43,7 @@
 
     // Extracts the required data from the xml response body
     //TODO Create function to filter last games by team x 
-    function extractData(data) {
-      console.log(data.getElementsByTagName('item')[0]);
+    function extractResultData(data) {
 
       const result = [];
 
@@ -56,46 +51,46 @@
 
 
       result.push({
-        'Date': getContent(entry, 'PlayDate'),
-        'Team': getContent(entry, 'TeamHomeCaption'),
-        'Sätze': getContent(entry, 'NumberOfWinsHome'),
-        'Satz 1': getContent(entry, 'Set1PointsHome'),
-        'Satz 2': getContent(entry, 'Set2PointsHome'),
-        'Satz 3': getContent(entry, 'Set3PointsHome'),
-        'Satz 4': getContent(entry, 'Set4PointsHome'),
-        'Satz 5': getContent(entry, 'Set5PointsHome'),
+        'Datum': getResultContent(entry, 'PlayDate'),
+        'Team': getResultContent(entry, 'TeamHomeCaption'),
+        'Sätze': getResultContent(entry, 'NumberOfWinsHome'),
+        'Satz 1': getResultContent(entry, 'Set1PointsHome'),
+        'Satz 2': getResultContent(entry, 'Set2PointsHome'),
+        'Satz 3': getResultContent(entry, 'Set3PointsHome'),
+        'Satz 4': getResultContent(entry, 'Set4PointsHome'),
+        'Satz 5': getResultContent(entry, 'Set5PointsHome'),
 
       });
 
       result.push({
-        'Date': getContent(entry, 'PlayDate'),
-        'Team': getContent(entry, 'TeamAwayCaption'),
-        'Sätze': getContent(entry, 'NumberOfWinsAway'),
-        'Satz 1': getContent(entry, 'Set1PointsAway'),
-        'Satz 2': getContent(entry, 'Set2PointsAway'),
-        'Satz 3': getContent(entry, 'Set3PointsAway'),
-        'Satz 4': getContent(entry, 'Set4PointsAway'),
-        'Satz 5': getContent(entry, 'Set5PointsAway'),
+        'Datum': getResultContent(entry, 'PlayDate'),
+        'Team': getResultContent(entry, 'TeamAwayCaption'),
+        'Sätze': getResultContent(entry, 'NumberOfWinsAway'),
+        'Satz 1': getResultContent(entry, 'Set1PointsAway'),
+        'Satz 2': getResultContent(entry, 'Set2PointsAway'),
+        'Satz 3': getResultContent(entry, 'Set3PointsAway'),
+        'Satz 4': getResultContent(entry, 'Set4PointsAway'),
+        'Satz 5': getResultContent(entry, 'Set5PointsAway'),
       })
 
       return result;
     }
 
-    function getContent(element, key) {
+    function getResultContent(element, key) {
       return element.getElementsByTagName(`${ key }`)[0].textContent
     }
 
 
     // Controls table creation
-    function displayData(dataArray) {
-      const table = document.getElementById('table');
+    function displayResultData(dataArray) {
+      const table = document.getElementById('results');
       const data = Object.keys(dataArray[0]);
-      createRankingTableHead(table, data);
-      createRankingTableBody(table, dataArray)
+      createResultTableHead(table, data);
+      createResultTableBody(table, dataArray)
     }
 
     // Creates table head, using the keys from the data-json-object
-    function createRankingTableHead(table, data) {
+    function createResultTableHead(table, data) {
       let thead = table.createTHead();
       let row = thead.insertRow();
 
@@ -109,7 +104,7 @@
     }
 
     // Creates table body
-    function createRankingTableBody(table, data) {
+    function createResultTableBody(table, data) {
       for (let element of data) {
         let row = table.insertRow();
         row.style.border_bottom = '2px solid black';
@@ -123,20 +118,21 @@
     }
 
   </script>
+  <!-- for site-wide presentation use 'padding: 2px 32px' on th,td-->
+  <!-- for small presentation use 'padding: 2px 8px' on th,td-->
   <style>
-    table {
+    #results {
       border-spacing: 0px;
-      border: 2px solid rgb(180, 176, 176);
     }
 
-    th,
-    td {
+    #results th,
+    #results td {
       text-align: center;
-      padding: 5px;
+      padding: 2px 32px;
       border-bottom: 1px solid rgb(180, 176, 176);
     }
 
-    th {
+    #results th {
       background-color: rgb(246, 246, 246);
     }
   </style>
