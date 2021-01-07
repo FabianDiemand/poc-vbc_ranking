@@ -6,7 +6,7 @@
 </head>
 
 <body>
-  <table id='table' style='border-collapse: collapse; text-align: center;'></table>
+  <table id='table'></table>
   <script>
     const parser = new DOMParser();
 
@@ -49,36 +49,42 @@
     //TODO Create function to filter last games by team x 
     function extractData(data) {
       console.log(data.getElementsByTagName('item')[0]);
+
       const result = [];
-      var numOfEntries = data.getElementsByTagName('item').length;
-      // for (let i = 0; i < numOfEntries; i++) {
+
       var entry = data.getElementsByTagName('item')[0];
+
+
       result.push({
-        Date: entry.getElementsByTagName('PlayDate')[0].textContent,
-        Team: entry.getElementsByTagName('TeamHomeCaption')[0].textContent,
-        Sätze: entry.getElementsByTagName('NumberOfWinsHome')[0].textContent,
-        Satz_1: entry.getElementsByTagName('Set1PointsHome')[0].textContent,
-        Satz_2: entry.getElementsByTagName('Set2PointsHome')[0].textContent,
-        Satz_3: entry.getElementsByTagName('Set3PointsHome')[0].textContent,
-        Satz_4: entry.getElementsByTagName('Set4PointsHome')[0].textContent,
-        Satz_5: entry.getElementsByTagName('Set5PointsHome')[0].textContent,
+        'Date': getContent(entry, 'PlayDate'),
+        'Team': getContent(entry, 'TeamHomeCaption'),
+        'Sätze': getContent(entry, 'NumberOfWinsHome'),
+        'Satz 1': getContent(entry, 'Set1PointsHome'),
+        'Satz 2': getContent(entry, 'Set2PointsHome'),
+        'Satz 3': getContent(entry, 'Set3PointsHome'),
+        'Satz 4': getContent(entry, 'Set4PointsHome'),
+        'Satz 5': getContent(entry, 'Set5PointsHome'),
 
       });
 
       result.push({
-        Date: entry.getElementsByTagName('PlayDate')[0].textContent,
-        Team: entry.getElementsByTagName('TeamAwayCaption')[0].textContent,
-        Sätze: entry.getElementsByTagName('NumberOfWinsAway')[0].textContent,
-        Satz_1: entry.getElementsByTagName('Set1PointsAway')[0].textContent,
-        Satz_2: entry.getElementsByTagName('Set2PointsAway')[0].textContent,
-        Satz_3: entry.getElementsByTagName('Set3PointsAway')[0].textContent,
-        Satz_4: entry.getElementsByTagName('Set4PointsAway')[0].textContent,
-        Satz_5: entry.getElementsByTagName('Set5PointsAway')[0].textContent,
+        'Date': getContent(entry, 'PlayDate'),
+        'Team': getContent(entry, 'TeamAwayCaption'),
+        'Sätze': getContent(entry, 'NumberOfWinsAway'),
+        'Satz 1': getContent(entry, 'Set1PointsAway'),
+        'Satz 2': getContent(entry, 'Set2PointsAway'),
+        'Satz 3': getContent(entry, 'Set3PointsAway'),
+        'Satz 4': getContent(entry, 'Set4PointsAway'),
+        'Satz 5': getContent(entry, 'Set5PointsAway'),
       })
-      // }
 
       return result;
     }
+
+    function getContent(element, key) {
+      return element.getElementsByTagName(`${ key }`)[0].textContent
+    }
+
 
     // Controls table creation
     function displayData(dataArray) {
@@ -97,7 +103,6 @@
       for (let key of data) {
         let th = document.createElement('th');
         let text = document.createTextNode(key);
-        setTableStyle(th);
         th.appendChild(text);
         row.appendChild(th);
       }
@@ -112,16 +117,27 @@
         for (key in element) {
           let cell = row.insertCell();
           let text = document.createTextNode(element[key]);
-          setTableStyle(cell);
           cell.appendChild(text);
         }
       }
     }
 
-    // Apply styles to the 'element'
-    function setTableStyle(element) {
-      element.style.border = '1px solid black';
-      element.style.padding = '3px';
-    }
   </script>
+  <style>
+    table {
+      border-spacing: 0px;
+      border: 2px solid rgb(180, 176, 176);
+    }
+
+    th,
+    td {
+      text-align: center;
+      padding: 5px;
+      border-bottom: 1px solid rgb(180, 176, 176);
+    }
+
+    th {
+      background-color: rgb(246, 246, 246);
+    }
+  </style>
 </body>
