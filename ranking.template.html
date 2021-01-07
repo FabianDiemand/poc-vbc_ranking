@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset='UTF8'>
+  <title>Ranking</title>
+</head>
+
+<body>
+  <table id='table' style='border-collapse: collapse; text-align: center;'></table>
+  <script>
+    const parser = new DOMParser();
+
+    // Content (re)loaded w.e. the page gets loaded
+    window.onload = function () {
+      soap();
+    };
+
+    // Main method to send the request and handle the response
+    // TODO: ErrorHandling!!!
+    function soap() {
+      const xml = new XMLHttpRequest();
+      xml.open('POST', 'https://myvolley.volleyball.ch/svserver.php', true);
+      var strRequest = createRequestString(13882);
+
+      xml.setRequestHeader('Content-Type', 'text/xml');
+      xml.setRequestHeader('SOAPAction', '');
+
+      xml.onreadystatechange = function () {
+        if (xml.readyState == 4) {
+          displayData(extractData(xml.responseXML));
+        }
+      };
+
+      xml.send(strRequest);
+    };
+
+    // Create different requests
+    // TODO: To be replaced by a static request as soon as staged on website!
+    function createRequestString(groupId) {
+      return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+        + '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typens="https://myvolley.volleyball.ch" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >'
+        + '<SOAP-ENV:Body>'
+        + `<mns:getTable xmlns:mns="https://myvolley.volleyball.ch" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><group_ID xsi:type="xsd:int">${ groupId }</group_ID></mns:getTable>`
+        + '</SOAP-ENV:Body>'
+        + '</SOAP-ENV:Envelope>'
+    }
+
+    // Extracts the required data from the xml response body
+    function extractData(data) {
+      console.log(data.getElementsByTagName('item')[0]);
+      const ranking = [];
+      var numOfEntries = data.getElementsByTagName('item').length;
+      for (let i = 0; i < numOfEntries; i++) {
+        var entry = data.getElementsByTagName('item')[i];
+        ranking.push({
+          Rang: entry.getElementsByTagName('Rank')[0].textContent,
+          Team: entry.getElementsByTagName('Caption')[0].textContent,
+          Siege: entry.getElementsByTagName('Wins')[0].textContent,
+          Niederlagen: entry.getElementsByTagName('Defeats')[0].textContent,
+          Punkte: entry.getElementsByTagName('Points')[0].textContent,
+        })
+      }
+
+      return ranking;
+    }
+
+    // Controls table creation
+    function displayData(dataArray) {
+      const table = document.getElementById('table');
+      const data = Object.keys(dataArray[0]);
+      createRankingTableHead(table, data);
+      createRankingTableBody(table, dataArray)
+    }
+
+    // Creates table head, using the keys from the data-json-object
+    function createRankingTableHead(table, data) {
+      let thead = table.createTHead();
+      let row = thead.insertRow();
+
+
+      for (let key of data) {
+        let th = document.createElement('th');
+        let text = document.createTextNode(key);
+        setTableStyle(th);
+        th.appendChild(text);
+        row.appendChild(th);
+      }
+    }
+
+    // Creates table body
+    function createRankingTableBody(table, data) {
+      for (let element of data) {
+        let row = table.insertRow();
+
+        for (key in element) {
+          let cell = row.insertCell();
+          let text = document.createTextNode(element[key]);
+          setTableStyle(cell);
+          cell.appendChild(text);
+        }
+      }
+    }
+
+    // Apply styles to the 'element'
+    function setTableStyle(element) {
+      element.style.border = '1px solid black';
+      element.style.padding = '3px';
+    }
+  </script>
+</body>
