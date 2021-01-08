@@ -46,8 +46,9 @@
       var numOfEntries = data.getElementsByTagName('item').length;
       for (let i = 0; i < numOfEntries; i++) {
         var entry = data.getElementsByTagName('item')[i];
+        var tmpRank = getTableContent(entry, 'Rank') === '&amp;nbsp;' ? tmpRank : getTableContent(entry, 'Rank');
         ranking.push({
-          Rang: getTableContent(entry, 'Rank') == '&amp;nbsp;' ? '' : getTableContent(entry, 'Rank'),
+          Rang: tmpRank,
           Team: getTableContent(entry, 'Caption'),
           Siege: getTableContent(entry, 'Wins'),
           Niederlagen: getTableContent(entry, 'Defeats'),
