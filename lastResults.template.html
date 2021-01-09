@@ -47,11 +47,11 @@
         'Datum': getResultContent(entry, 'PlayDate'),
         'Team': getResultContent(entry, 'TeamHomeCaption'),
         'Sätze': getResultContent(entry, 'NumberOfWinsHome'),
-        'Satz 1': getResultContent(entry, 'Set1PointsHome'),
-        'Satz 2': getResultContent(entry, 'Set2PointsHome'),
-        'Satz 3': getResultContent(entry, 'Set3PointsHome'),
-        'Satz 4': getResultContent(entry, 'Set4PointsHome'),
-        'Satz 5': getResultContent(entry, 'Set5PointsHome'),
+        'Satz 1': getResultContent(entry, 'Set1PointsHome').checkSetPoints(),
+        'Satz 2': getResultContent(entry, 'Set2PointsHome').checkSetPoints(),
+        'Satz 3': getResultContent(entry, 'Set3PointsHome').checkSetPoints(),
+        'Satz 4': getResultContent(entry, 'Set4PointsHome').checkSetPoints(),
+        'Satz 5': getResultContent(entry, 'Set5PointsHome').checkSetPoints(),
 
       });
 
@@ -59,11 +59,11 @@
         'Datum': getResultContent(entry, 'PlayDate'),
         'Team': getResultContent(entry, 'TeamAwayCaption'),
         'Sätze': getResultContent(entry, 'NumberOfWinsAway'),
-        'Satz 1': getResultContent(entry, 'Set1PointsAway'),
-        'Satz 2': getResultContent(entry, 'Set2PointsAway'),
-        'Satz 3': getResultContent(entry, 'Set3PointsAway'),
-        'Satz 4': getResultContent(entry, 'Set4PointsAway'),
-        'Satz 5': getResultContent(entry, 'Set5PointsAway'),
+        'Satz 1': getResultContent(entry, 'Set1PointsAway').checkSetPoints(),
+        'Satz 2': getResultContent(entry, 'Set2PointsAway').checkSetPoints(),
+        'Satz 3': getResultContent(entry, 'Set3PointsAway').checkSetPoints(),
+        'Satz 4': getResultContent(entry, 'Set4PointsAway').checkSetPoints(),
+        'Satz 5': getResultContent(entry, 'Set5PointsAway').checkSetPoints(),
       })
 
       return result;
@@ -71,6 +71,10 @@
 
     function getResultContent(element, key) {
       return element.getElementsByTagName(`${ key }`)[0].textContent
+    }
+
+    String.prototype.checkSetPoints = function () {
+      return this == '-1' ? '-' : this;
     }
 
 
