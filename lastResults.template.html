@@ -12,9 +12,6 @@
       xml.open('POST', 'https://myvolley.volleyball.ch/svserver.php', true);
       var strRequest = createResultRequestString(13882);
 
-      xml.setRequestHeader('Content-Type', 'text/xml');
-      xml.setRequestHeader('SOAPAction', '');
-
       xml.onreadystatechange = function () {
         if (xml.readyState == 4) {
           displayResultData(extractResultData(xml.responseXML));
