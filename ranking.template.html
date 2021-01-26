@@ -93,17 +93,62 @@
   <style>
     #ranking {
       border-spacing: 0px;
+      width: auto
+    }
+
+    #container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     #ranking th,
     #ranking td {
       text-align: center;
-      padding: 3px 30px;
+      padding: 3px 65px;
       border-bottom: 1px solid rgb(180, 176, 176);
     }
 
     #ranking th {
       background-color: rgb(246, 246, 246);
+    }
+
+    @media only screen and (max-width: 500px) {
+
+      table#ranking>tbody>tr>td.siege,
+      table#ranking>tbody>tr>td.niederlagen {
+        display: none;
+      }
+
+      table#ranking>thead>tr>th.siege,
+      table#ranking>thead>tr>th.niederlagen {
+        display: none;
+      }
+
+      #ranking th,
+      #ranking td {
+        text-align: center;
+        padding: 3px 65px;
+        border-bottom: 1px solid rgb(180, 176, 176);
+      }
+
+      #ranking th.rang,
+      #ranking th.punkte,
+      #ranking td.rang,
+      #ranking td.punkte {
+        width: auto;
+        padding: 3px 5px;
+      }
+
+      #ranking th.team,
+      #ranking td.team {
+        padding: 3px 0;
+        width: 200px;
+      }
+
+      #ranking th {
+        background-color: rgb(246, 246, 246);
+      }
     }
   </style>
 </body>
