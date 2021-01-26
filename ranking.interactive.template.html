@@ -1,7 +1,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <body>
-  <div id='container'>
+  <div id='container' style='width: 1040px'>
     <div id='buttons'>
       <input type='button' id='hnlb' value='H NLB' style='margin-bottom: 10px' />
       <input type='button' id='h1l' value='H 1L' />
@@ -132,6 +132,9 @@
           let cell = row.insertCell();
           cell.setAttribute('class', key.toLowerCase());
           let text = document.createTextNode(element[key]);
+          // if (element[key] == 'VBC Uni Bern') {
+          //   row.style.backgroundColor = ' rgba(221, 142, 142, 0.589)';
+          // }
           cell.appendChild(text);
         }
       }
@@ -154,6 +157,7 @@
     #ranking th,
     #ranking td {
       text-align: center;
+      width: auto;
       padding: 3px 65px;
       border-bottom: 1px solid rgb(180, 176, 176);
     }
@@ -162,41 +166,41 @@
       background-color: rgb(246, 246, 246);
     }
 
+
+
+    table#ranking td {
+      font-weight: normal;
+    }
+
+    table#ranking th,
+    table#ranking td.punkte {
+      font-weight: bold;
+    }
+
+    @media only screen and (max-width: 1040px) {
+
+      table#ranking th,
+      table#ranking td {
+        width: auto;
+        padding: 3px;
+      }
+    }
+
     @media only screen and (max-width: 500px) {
 
-      table#ranking>tbody>tr>td.siege,
-      table#ranking>tbody>tr>td.niederlagen {
+      table#ranking .siege,
+      table#ranking .niederlagen {
         display: none;
       }
 
-      table#ranking>thead>tr>th.siege,
-      table#ranking>thead>tr>th.niederlagen {
-        display: none;
-      }
-
-      #ranking th,
-      #ranking td {
-        text-align: center;
-        padding: 3px 65px;
-        border-bottom: 1px solid rgb(180, 176, 176);
-      }
-
-      #ranking th.rang,
-      #ranking th.punkte,
-      #ranking td.rang,
-      #ranking td.punkte {
+      table#ranking .rang,
+      table#ranking .punkte {
         width: auto;
         padding: 3px 5px;
       }
 
-      #ranking th.team,
-      #ranking td.team {
+      table#ranking .team {
         padding: 3px 0;
-        width: 200px;
-      }
-
-      #ranking th {
-        background-color: rgb(246, 246, 246);
       }
     }
   </style>
