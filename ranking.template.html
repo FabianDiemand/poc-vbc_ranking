@@ -1,8 +1,12 @@
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <body>
-  <table id='ranking'></table>
   <script>
     // Content (re)loaded w.e. the page gets loaded
-    window.addEventListener('load', () => fetchTableData(13965));
+    window.addEventListener('load', () => {
+      createContainer();
+      fetchTableData(13965)
+    });
 
     // Main method to send the request and handle the response
     // TODO: ErrorHandling!!!
@@ -49,13 +53,30 @@
       return ranking;
     }
 
+    function createContainer() {
+      let refNode = document.getElementsByClassName('cd-group-detail')
+      let container = document.createElement('div');
+      container.id = 'container';
+      refNode[0].insertBefore(container, refNode[0]['children'][1]);
+    }
+
     function getTableContent(element, key) {
       return element.getElementsByTagName(`${ key }`)[0].textContent
     }
 
     // Controls table creation
     function displayTableData(dataArray) {
-      const table = document.getElementById('ranking');
+
+      if (document.getElementById('ranking')) {
+        let tmp = document.getElementById('ranking');
+        tmp.parentNode.removeChild(tmp);
+      }
+
+      const container = document.getElementById('container');
+      const table = document.createElement('table');
+      table.id = 'ranking';
+      container.append(table);
+
       const data = Object.keys(dataArray[0]);
       createRankingTableHead(table, data);
       createRankingTableBody(table, dataArray)
@@ -69,6 +90,7 @@
 
       for (let key of data) {
         let th = document.createElement('th');
+        th.setAttribute('class', key.toLowerCase());
         let text = document.createTextNode(key);
         th.appendChild(text);
         row.appendChild(th);
@@ -87,9 +109,9 @@
           let cell = row.insertCell();
           cell.setAttribute('class', key.toLowerCase());
           let text = document.createTextNode(element[key]);
-          // if (element[key] == 'VBC Uni Bern') {
-          //   row.style.backgroundColor = ' rgba(221, 142, 142, 0.589)';
-          // }
+          if (element[key] == 'VBC Uni Bern') {
+            row.style.backgroundColor = ' rgba(221, 142, 142, 0.100)';
+          }
           cell.appendChild(text);
         }
       }
@@ -104,6 +126,7 @@
     }
 
     #container {
+      padding: 20px 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -118,7 +141,8 @@
     }
 
     #ranking th {
-      background-color: rgb(246, 246, 246);
+      background-color: black;
+      color: white;
     }
 
 
