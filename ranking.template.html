@@ -54,14 +54,14 @@
     }
 
     function createContainer() {
-      let refNode = document.getElementsByClassName('cd-group-detail')
+      let refNode = document.getElementsByClassName('cd-group-detail')[0];
       let container = document.createElement('div');
       container.id = 'container';
-      refNode[0].insertBefore(container, refNode[0]['children'][1]);
+      refNode.children[0].insertAdjacentElement('afterend', container);
     }
 
     function getTableContent(element, key) {
-      return element.getElementsByTagName(`${ key }`)[0].textContent
+      return element.getElementsByTagName(`${ key }`)[0].textContent;
     }
 
     // Controls table creation
@@ -79,7 +79,7 @@
 
       const data = Object.keys(dataArray[0]);
       createRankingTableHead(table, data);
-      createRankingTableBody(table, dataArray)
+      createRankingTableBody(table, dataArray);
     }
 
     // Creates table head, using the keys from the data-json-object
