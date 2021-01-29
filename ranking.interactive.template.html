@@ -132,9 +132,9 @@
           let cell = row.insertCell();
           cell.setAttribute('class', key.toLowerCase());
           let text = document.createTextNode(element[key]);
-          // if (element[key] == 'VBC Uni Bern') {
-          //   row.style.backgroundColor = ' rgba(221, 142, 142, 0.589)';
-          // }
+          if (element[key].includes('VBC Uni Bern')) {
+            row.style.backgroundColor = ' rgba(221, 142, 142, 0.589)';
+          }
           cell.appendChild(text);
         }
       }

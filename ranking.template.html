@@ -5,7 +5,7 @@
     // Content (re)loaded w.e. the page gets loaded
     window.addEventListener('load', () => {
       createContainer();
-      fetchTableData(13965)
+      fetchTableData(14197)
     });
 
     // Main method to send the request and handle the response
@@ -109,7 +109,7 @@
           let cell = row.insertCell();
           cell.setAttribute('class', key.toLowerCase());
           let text = document.createTextNode(element[key]);
-          if (element[key] == 'VBC Uni Bern') {
+          if (element[key].includes('VBC Uni Bern')) {
             row.style.backgroundColor = ' rgba(221, 142, 142, 0.100)';
           }
           cell.appendChild(text);
