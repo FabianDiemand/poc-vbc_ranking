@@ -2,6 +2,7 @@
   <table id='results'></table>
   <script>
 
+
     // Content (re)loaded w.e. the page gets loaded
     window.addEventListener('load', fetchResultData);
 
@@ -34,28 +35,24 @@
     // Extracts the required data from the xml response body
     //TODO Create function to filter last games by team x 
     function extractResultData(data) {
-
       const result = [];
 
-      var entry = data.getElementsByTagName('item')[0];
-
+      let entry = data.getElementsByTagName('item')[0];
 
       result.push({
-        'Datum': getResultContent(entry, 'PlayDate'),
+        'Datum': getResultContent(entry, 'PlayDate').formatDateTimeCH(),
         'Team': getResultContent(entry, 'TeamHomeCaption'),
-        'Sätze': getResultContent(entry, 'NumberOfWinsHome'),
+        'Resultat': getResultContent(entry, 'NumberOfWinsHome'),
         'Satz 1': getResultContent(entry, 'Set1PointsHome').checkSetPoints(),
         'Satz 2': getResultContent(entry, 'Set2PointsHome').checkSetPoints(),
         'Satz 3': getResultContent(entry, 'Set3PointsHome').checkSetPoints(),
         'Satz 4': getResultContent(entry, 'Set4PointsHome').checkSetPoints(),
         'Satz 5': getResultContent(entry, 'Set5PointsHome').checkSetPoints(),
-
       });
 
       result.push({
-        'Datum': getResultContent(entry, 'PlayDate'),
         'Team': getResultContent(entry, 'TeamAwayCaption'),
-        'Sätze': getResultContent(entry, 'NumberOfWinsAway'),
+        'Resultat': getResultContent(entry, 'NumberOfWinsAway'),
         'Satz 1': getResultContent(entry, 'Set1PointsAway').checkSetPoints(),
         'Satz 2': getResultContent(entry, 'Set2PointsAway').checkSetPoints(),
         'Satz 3': getResultContent(entry, 'Set3PointsAway').checkSetPoints(),
@@ -68,6 +65,13 @@
 
     function getResultContent(element, key) {
       return element.getElementsByTagName(`${ key }`)[0].textContent
+    }
+
+    String.prototype.formatDateTimeCH = function () {
+      let dateTimeSplit = this.split(' ');
+      let dateSplit = dateTimeSplit[0].split('-');
+      let timeSplit = dateTimeSplit[1].split(':');
+      return `${ dateSplit[2] }.${ dateSplit[1] }.${ dateSplit[0] } \n ${ timeSplit[0] }:${ timeSplit[1] }`;
     }
 
     String.prototype.checkSetPoints = function () {
@@ -86,14 +90,12 @@
     // Creates table head, using the keys from the data-json-object
     function createResultTableHead(table, data) {
       let thead = table.createTHead();
-      let row = thead.insertRow();
-
 
       for (let key of data) {
         let th = document.createElement('th');
         let text = document.createTextNode(key);
         th.appendChild(text);
-        row.appendChild(th);
+        thead.appendChild(th);
       }
     }
 
@@ -104,9 +106,15 @@
         row.style.border_bottom = '2px solid black';
 
         for (key in element) {
-          let cell = row.insertCell();
+          console.log(key);
+          let cell = document.createElement('td');
+          cell.className = key.toLowerCase().replace(' ', '');
+
+          if (key === 'Datum') { cell.rowSpan = 2; }
+
           let text = document.createTextNode(element[key]);
           cell.appendChild(text);
+          row.appendChild(cell);
         }
       }
     }
