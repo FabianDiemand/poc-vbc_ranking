@@ -1,17 +1,17 @@
 <body>
   <table id='results'></table>
   <script>
-
-
     // Content (re)loaded w.e. the page gets loaded
-    window.addEventListener('load', fetchResultData);
+    window.addEventListener('load', () => {
+      fetchResultData(13882);
+    });
 
     // Main method to send the request and handle the response
     // TODO: ErrorHandling!!!
-    function fetchResultData() {
+    function fetchResultData(groupId) {
       const xml = new XMLHttpRequest();
       xml.open('POST', 'https://myvolley.volleyball.ch/svserver.php', true);
-      var strRequest = createResultRequestString(13882);
+      var strRequest = createResultRequestString(groupId);
 
       xml.onreadystatechange = function () {
         if (xml.readyState == 4) {
@@ -35,32 +35,39 @@
     // Extracts the required data from the xml response body
     //TODO Create function to filter last games by team x 
     function extractResultData(data) {
-      const result = [];
+      const games = [];
 
-      let entry = data.getElementsByTagName('item')[0];
-
-      result.push({
-        'Datum': getResultContent(entry, 'PlayDate').formatDateTimeCH(),
-        'Team': getResultContent(entry, 'TeamHomeCaption'),
-        'Resultat': getResultContent(entry, 'NumberOfWinsHome'),
-        'Satz 1': getResultContent(entry, 'Set1PointsHome').checkSetPoints(),
-        'Satz 2': getResultContent(entry, 'Set2PointsHome').checkSetPoints(),
-        'Satz 3': getResultContent(entry, 'Set3PointsHome').checkSetPoints(),
-        'Satz 4': getResultContent(entry, 'Set4PointsHome').checkSetPoints(),
-        'Satz 5': getResultContent(entry, 'Set5PointsHome').checkSetPoints(),
-      });
-
-      result.push({
-        'Team': getResultContent(entry, 'TeamAwayCaption'),
-        'Resultat': getResultContent(entry, 'NumberOfWinsAway'),
-        'Satz 1': getResultContent(entry, 'Set1PointsAway').checkSetPoints(),
-        'Satz 2': getResultContent(entry, 'Set2PointsAway').checkSetPoints(),
-        'Satz 3': getResultContent(entry, 'Set3PointsAway').checkSetPoints(),
-        'Satz 4': getResultContent(entry, 'Set4PointsAway').checkSetPoints(),
-        'Satz 5': getResultContent(entry, 'Set5PointsAway').checkSetPoints(),
-      })
-
-      return result;
+      for (let entry of data.getElementsByTagName('item')) {
+        if (getResultContent(entry, 'IsResultCommited') == 1) {
+          games.push({
+            Game: {
+              Datum: getResultContent(entry, 'PlayDate').formatDateTimeCH(),
+              Teams: [{
+                Home: {
+                  Team: getResultContent(entry, 'TeamHomeCaption'),
+                  Resultat: getResultContent(entry, 'NumberOfWinsHome'),
+                  Satz1: getResultContent(entry, 'Set1PointsHome').formatSetPoints(),
+                  Satz2: getResultContent(entry, 'Set2PointsHome').formatSetPoints(),
+                  Satz3: getResultContent(entry, 'Set3PointsHome').formatSetPoints(),
+                  Satz4: getResultContent(entry, 'Set4PointsHome').formatSetPoints(),
+                  Satz5: getResultContent(entry, 'Set5PointsHome').formatSetPoints(),
+                },
+                Away: {
+                  Team: getResultContent(entry, 'TeamAwayCaption'),
+                  Resultat: getResultContent(entry, 'NumberOfWinsAway'),
+                  Satz1: getResultContent(entry, 'Set1PointsAway').formatSetPoints(),
+                  Satz2: getResultContent(entry, 'Set2PointsAway').formatSetPoints(),
+                  Satz3: getResultContent(entry, 'Set3PointsAway').formatSetPoints(),
+                  Satz4: getResultContent(entry, 'Set4PointsAway').formatSetPoints(),
+                  Satz5: getResultContent(entry, 'Set5PointsAway').formatSetPoints(),
+                }
+              }
+              ]
+            }
+          })
+        }
+      }
+      return games;
     }
 
     function getResultContent(element, key) {
@@ -68,31 +75,39 @@
     }
 
     String.prototype.formatDateTimeCH = function () {
-      let dateTimeSplit = this.split(' ');
-      let dateSplit = dateTimeSplit[0].split('-');
-      let timeSplit = dateTimeSplit[1].split(':');
+      const dateTimeSplit = this.split(' ');
+      const dateSplit = dateTimeSplit[0].split('-');
+      const timeSplit = dateTimeSplit[1].split(':');
       return `${ dateSplit[2] }.${ dateSplit[1] }.${ dateSplit[0] } \n ${ timeSplit[0] }:${ timeSplit[1] }`;
     }
 
-    String.prototype.checkSetPoints = function () {
+    String.prototype.formatSetPoints = function () {
       return this == '-1' ? '-' : this;
     }
-
 
     // Controls table creation
     function displayResultData(dataArray) {
       const table = document.getElementById('results');
-      const data = Object.keys(dataArray[0]);
-      createResultTableHead(table, data);
+
+      if (!table.firstChild) {
+        // Header titles
+        createResultTableHead(table);
+      }
+
       createResultTableBody(table, dataArray)
     }
 
     // Creates table head, using the keys from the data-json-object
-    function createResultTableHead(table, data) {
-      let thead = table.createTHead();
+    function createResultTableHead(table) {
+      const headers = ['Datum', 'Team', 'Resultat', 'Satz 1', 'Satz 2', 'Satz 3', 'Satz 4', 'Satz 5'];
+      const thead = table.createTHead();
 
-      for (let key of data) {
+      for (let key of headers) {
         let th = document.createElement('th');
+        th.className = key.toLowerCase().replace(' ', '');
+
+        if (key.startsWith('Satz')) th.className = `satz ${ key.toLowerCase().replace(' ', '') }`;
+
         let text = document.createTextNode(key);
         th.appendChild(text);
         thead.appendChild(th);
@@ -100,41 +115,79 @@
     }
 
     // Creates table body
-    function createResultTableBody(table, data) {
-      for (let element of data) {
-        let row = table.insertRow();
-        row.style.border_bottom = '2px solid black';
+    function createResultTableBody(table, games) {
+      games.forEach(entry => {
+        const game = entry.Game;
 
-        for (key in element) {
-          let cell = document.createElement('td');
-          cell.className = key.toLowerCase().replace(' ', '');
+        const tbody = table.createTBody();
+        tbody.className = 'game';
 
-          if (key === 'Datum') { cell.rowSpan = 2; }
+        const dateCell = document.createElement('td');
+        dateCell.className = 'datum';
+        dateCell.rowSpan = 2;
 
-          let text = document.createTextNode(element[key]);
-          cell.appendChild(text);
-          row.appendChild(cell);
+        const dateText = document.createTextNode(game.Datum);
+        dateCell.appendChild(dateText);
+
+        for (let teams of game['Teams']) {
+          for (let team in teams) {
+            let row = tbody.insertRow(0);
+            row.style.border_bottom = '2px solid black';
+            row.className = team.toLowerCase();
+            row.appendChild(dateCell);
+
+            for (let key in teams[team]) {
+              let dataCell = row.insertCell();
+              dataCell.className = key.toLowerCase().replace(' ', '');
+
+              if (key.startsWith('Satz')) dataCell.className = `satz ${ key.toLowerCase().replace(' ', '') }`;
+
+              let text = document.createTextNode((teams[team])[key]);
+              dataCell.appendChild(text);
+            }
+          }
         }
       }
+      )
     }
+
+
+
+
 
   </script>
   <!-- for site-wide presentation use 'padding: 2px 32px' on th,td-->
   <!-- for small presentation use 'padding: 2px 8px' on th,td-->
   <style>
-    #results {
+    table#results {
       border-spacing: 0px;
+      border-collapse: collapse;
+      white-space: nowrap;
     }
 
-    #results th,
-    #results td {
+    table#results thead {
+      background-color: black;
+      color: white;
+    }
+
+    table#results tr {
+      border-bottom: 1px solid black;
+    }
+
+    table#results th,
+    td {
       text-align: center;
-      padding: 2px 32px;
-      border-bottom: 1px solid rgb(180, 176, 176);
+      padding: 2px 45px;
     }
 
-    #results th {
-      background-color: rgb(246, 246, 246);
+    table#results th.satz,
+    table#results td.satz {
+      width: fit-content;
+      padding: 2px 20px;
+    }
+
+    table#results tbody.game {
+      border-bottom: 2px solid black;
     }
   </style>
 </body>
