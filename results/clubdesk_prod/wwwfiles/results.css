@@ -31,7 +31,7 @@ table#results tbody.game {
 }
 
 table#results td.defeat:not(.team) {
-  color: rgb(161, 161, 161);
+  color: rgb(170, 170, 170);
 }
 
 table#results td.win{
