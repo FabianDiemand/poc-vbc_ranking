@@ -9,27 +9,31 @@
     // Main method to send the request and handle the response
     // TODO: ErrorHandling!!!
     function fetchResultData(groupId) {
-      const xml = new XMLHttpRequest();
-      xml.open('POST', 'https://myvolley.volleyball.ch/svserver.php', true);
-      var strRequest = createResultRequestString(groupId);
+      const url = 'https://myvolley.volleyball.ch/svserver.php';
+      const requestBody = createResultRequestString(groupId);
 
-      xml.onreadystatechange = function () {
-        if (xml.readyState == 4) {
-          displayResultData(extractResultData(xml.responseXML));
-        }
-      };
-
-      xml.send(strRequest);
+      fetch(url, {
+        body: requestBody,
+        method: 'POST'
+      }).then(response => response.text())
+        .then(text => new DOMParser().parseFromString(text, 'text/xml'))
+        .then(data => displayResultData(extractResultData(data)));
     };
 
     // Create different requests
     function createResultRequestString(groupId) {
-      return '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
-        + '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typens="https://myvolley.volleyball.ch" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >'
-        + '<SOAP-ENV:Body>'
-        + `<mns:getGames xmlns:mns="https://myvolley.volleyball.ch" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><group_ID xsi:type="xsd:int">${ groupId }</group_ID></mns:getGames>`
+      const soapEnverlopePrefix = '<?xml version="1.0" encoding="UTF-8" standalone="no"?>'
+        + '<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:typens="https://myvolley.volleyball.ch" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://schemas.xmlsoap.org/soap/encoding/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" >';
+
+      const soapEnvelopePostfix = '</SOAP-ENV:Envelope>'
+
+      const soapBody = '<SOAP-ENV:Body>' +
+        `<mns:getGames xmlns:mns="https://myvolley.volleyball.ch" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">`
+        + `<group_ID xsi:type="xsd:int">${ groupId }</group_ID>`
+        + `</mns:getGames>`
         + '</SOAP-ENV:Body>'
-        + '</SOAP-ENV:Envelope>'
+
+      return soapEnverlopePrefix + soapBody + soapEnvelopePostfix;
     }
 
     // Extracts the required data from the xml response body
@@ -81,8 +85,14 @@
       return `${ dateSplit[2] }.${ dateSplit[1] }.${ dateSplit[0] } \n ${ timeSplit[0] }:${ timeSplit[1] }`;
     }
 
+    // //replace not played sets by a hyphen
+    // String.prototype.formatSetPoints = function () {
+    //   return this == '-1' ? '-' : this;
+    // }
+
+    //Replace not played sets by whitespace
     String.prototype.formatSetPoints = function () {
-      return this == '-1' ? '-' : this;
+      return this == '-1' ? '' : this;
     }
 
     // Controls table creation
@@ -149,11 +159,46 @@
         }
       }
       )
+
+      formatTableContent();
     }
 
 
+    function formatTableContent() {
+      const looseColor = 'gray';
+      const boldness = 600;
 
+      const table = document.getElementById('results');
+      const games = table.getElementsByClassName('game');
 
+      for (let game of games) {
+        const homeTeamSets = game.getElementsByClassName('home')[0].getElementsByClassName('satz');
+        const awayTeamSets = game.getElementsByClassName('away')[0].getElementsByClassName('satz');
+
+        for (let i = 0; i < homeTeamSets.length; i++) {
+          if (homeTeamSets[i].innerText > awayTeamSets[i].innerText) {
+            homeTeamSets[i].style.fontWeight = boldness;
+            awayTeamSets[i].style.color = looseColor;
+          } else {
+            awayTeamSets[i].style.fontWeight = boldness;
+            homeTeamSets[i].style.color = looseColor;
+          }
+        }
+
+        const homeTeamWins = game.getElementsByClassName('home')[0].getElementsByClassName('resultat')[0];
+        const awayTeamWins = game.getElementsByClassName('away')[0].getElementsByClassName('resultat')[0];
+        const homeTeamName = game.getElementsByClassName('home')[0].getElementsByClassName('team')[0];
+        const awayTeamName = game.getElementsByClassName('away')[0].getElementsByClassName('team')[0];
+
+        if (homeTeamWins.innerText > awayTeamWins.innerText) {
+          awayTeamWins.style.color = looseColor;
+          homeTeamName.style.fontWeight = boldness;
+        } else {
+          homeTeamWins.style.color = looseColor;
+          awayTeamName.style.fontWeight = boldness;
+        }
+      }
+    }
 
   </script>
   <!-- for site-wide presentation use 'padding: 2px 32px' on th,td-->
@@ -170,20 +215,21 @@
       color: white;
     }
 
-    table#results tr {
-      border-bottom: 1px solid black;
-    }
-
     table#results th,
     td {
+      height: min-content;
       text-align: center;
       padding: 2px 45px;
+    }
+
+    table#results td.resultat {
+      font-weight: bold;
     }
 
     table#results th.satz,
     table#results td.satz {
       width: fit-content;
-      padding: 2px 20px;
+      padding: 2px 10px;
     }
 
     table#results tbody.game {

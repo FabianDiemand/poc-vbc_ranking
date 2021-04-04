@@ -1,0 +1,25 @@
+<html>
+<!DOCTYPE html>
+
+<head>
+  <script type="text/javascript" src="ranking.specific.js"></script>
+  <link rel="stylesheet" href="ranking.specific.css">
+  </link>
+</head>
+
+<body>
+  <!-- Needed so that the sites' content can be displayed in any local browser -->
+  <!-- Not needed in production code, where the container is created by js, if none exists -->
+  <div class='TEST' id='table_container'></div>
+
+  <script>
+    // Content (re)loaded w.e. the page gets loaded
+    window.onload = () => {
+      // Give Teamname if it's something else than "VBC Uni Bern"
+      // e.g.: fetchTableData(13882, 'Volley Oberdiessbach')
+      fetchTableData(13882, 'Volley Oberdiessbach')
+    }
+  </script>
+</body>
+
+</html>

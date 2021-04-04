@@ -1,0 +1,61 @@
+#ranking {
+  border-spacing: 0px;
+  width: auto
+}
+
+#table_container {
+  padding: 20px 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#ranking th,
+#ranking td {
+  text-align: center;
+  width: auto;
+  padding: 3px 65px;
+  border-bottom: 1px solid rgb(180, 176, 176);
+}
+
+#ranking th {
+  background-color: black;
+  color: white;
+  border-bottom: none;
+}
+
+table#ranking td {
+  font-weight: normal;
+}
+
+table#ranking th,
+table#ranking td.punkte {
+  font-weight: bold;
+}
+
+@media only screen and (max-width: 1040px) {
+
+  table#ranking th,
+  table#ranking td {
+    width: auto;
+    padding: 3px;
+  }
+}
+
+@media only screen and (max-width: 500px) {
+
+  table#ranking .siege,
+  table#ranking .niederlagen {
+    display: none;
+  }
+
+  table#ranking .rang,
+  table#ranking .punkte {
+    width: auto;
+    padding: 3px 5px;
+  }
+
+  table#ranking .team {
+    padding: 3px 0;
+  }
+}

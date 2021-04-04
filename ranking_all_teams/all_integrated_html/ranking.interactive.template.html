@@ -1,12 +1,56 @@
+<!-- These are no real test files -->
+<!-- This file is written in a manner to be independent from clubdesk or elements on clubdesk pages. -->
+<!-- Therefore this code may and should be used for testing functionality or new features in a neutral browser environment (e.g. Chrome). -->
+
+<!-- I recommend testing simple content loading or presentational features with the "ranking.template.test.html"-code. -->
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <body>
+  <div id='container' style='width: 1040px'>
+    <div id='buttons'>
+      <input type='button' id='hnlb' value='H NLB' style='margin-bottom: 10px' />
+      <input type='button' id='h1l' value='H 1L' />
+      <input type='button' id='h2l' value='H 2L' />
+      <input type='button' id='h3l' value='H 3L' />
+      <input type='button' id='h4l' value='H 4L' />
+      <input type='button' id='d1l' value='D 1L' />
+      <input type='button' id='d2l' value='D 2L' />
+      <input type='button' id='d3l' value='D 3L' />
+      <input type='button' id='d4l' value='D 4L' />
+      <input type='button' id='d5l' value='D 5L' />
+      <input type='button' id='jmu20' value='J M U20' />
+      <input type='button' id='jmu18' value='J M U18' />
+      <input type='button' id='jmu16' value='J M U16' />
+      <input type='button' id='jwu19' value='J W U19' />
+    </div>
+  </div>
+
+
   <script>
     // Content (re)loaded w.e. the page gets loaded
-    window.addEventListener('load', () => {
-      createContainer();
-      fetchTableData(14197)
-    });
+    window.addEventListener('load', setupPage);
+
+    //Sets up the page with all functionallity
+    function setupPage() {
+      fetchTableData(13965);
+
+      document.getElementById('hnlb').addEventListener('click', () => fetchTableData(13882));
+      document.getElementById('h1l').addEventListener('click', () => fetchTableData(13931));
+      document.getElementById('h2l').addEventListener('click', () => fetchTableData(13965));
+      document.getElementById('h3l').addEventListener('click', () => fetchTableData(13993));
+      document.getElementById('h4l').addEventListener('click', () => fetchTableData(13968));
+      document.getElementById('d1l').addEventListener('click', () => fetchTableData(13916));
+      document.getElementById('d2l').addEventListener('click', () => fetchTableData(13976));
+      document.getElementById('d3l').addEventListener('click', () => fetchTableData(13959));
+      document.getElementById('d4l').addEventListener('click', () => fetchTableData(13958));
+      document.getElementById('d5l').addEventListener('click', () => fetchTableData(13976));
+      document.getElementById('jmu20').addEventListener('click', () => fetchTableData(14211));
+      document.getElementById('jmu18').addEventListener('click', () => fetchTableData(14207));
+      document.getElementById('jmu16').addEventListener('click', () => fetchTableData(14255));
+      document.getElementById('jwu19').addEventListener('click', () => fetchTableData(14197));
+    }
+
 
     // Main method to send the request and handle the response
     // TODO: ErrorHandling!!!
@@ -53,18 +97,12 @@
       return ranking;
     }
 
-    function createContainer() {
-      let refNode = document.getElementsByClassName('cd-group-detail')[0];
-      let container = document.createElement('div');
-      container.id = 'container';
-      refNode.children[0].insertAdjacentElement('afterend', container);
-    }
-
     function getTableContent(element, key) {
-      return element.getElementsByTagName(`${ key }`)[0].textContent;
+      return element.getElementsByTagName(`${ key }`)[0].textContent
     }
 
     // Controls table creation
+    // TODO: Adapt to work relative to clubdesk elements if needed.
     function displayTableData(dataArray) {
 
       if (document.getElementById('ranking')) {
@@ -79,7 +117,7 @@
 
       const data = Object.keys(dataArray[0]);
       createRankingTableHead(table, data);
-      createRankingTableBody(table, dataArray);
+      createRankingTableBody(table, dataArray)
     }
 
     // Creates table head, using the keys from the data-json-object
@@ -110,14 +148,15 @@
           cell.setAttribute('class', key.toLowerCase());
           let text = document.createTextNode(element[key]);
           if (element[key].includes('VBC Uni Bern')) {
-            row.style.backgroundColor = ' rgba(221, 142, 142, 0.100)';
+            row.style.backgroundColor = ' rgba(221, 142, 142, 0.589)';
           }
           cell.appendChild(text);
         }
       }
     }
   </script>
-  <!-- The following section <style> contains all CSS commands -->
+
+  <!-- The following section <style> contains all CSS commands for presentation and style of contents. -->
   <!-- small version: use 'padding 3px 30px'-->
   <!-- wide version: use 'padding 3px 65px'-->
   <style>
@@ -127,7 +166,6 @@
     }
 
     #container {
-      padding: 20px 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -142,8 +180,7 @@
     }
 
     #ranking th {
-      background-color: black;
-      color: white;
+      background-color: rgb(246, 246, 246);
       border-bottom: none;
     }
 

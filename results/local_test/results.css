@@ -1,0 +1,39 @@
+table#results {
+  border-spacing: 0px;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+table#results thead {
+  background-color: black;
+  color: white;
+}
+
+table#results th,
+td {
+  height: min-content;
+  text-align: center;
+  padding: 2px 45px;
+}
+
+table#results td.resultat {
+  font-weight: bold;
+}
+
+table#results th.satz,
+table#results td.satz {
+  width: fit-content;
+  padding: 2px 10px;
+}
+
+table#results tbody.game {
+  border-bottom: 2px solid black;
+}
+
+table#results td.defeat:not(.team) {
+  color: rgb(161, 161, 161);
+}
+
+table#results td.win{
+  font-weight: bold;
+}
