@@ -134,14 +134,17 @@ function displayResultData(data) {
  * @param {HTMLTableElement} table html table element created by the caller
  */
 function createResultTableHead(table) {
-  const headerTitles = ['Datum', 'Team', 'Resultat', 'Satz 1', 'Satz 2', 'Satz 3', 'Satz 4', 'Satz 5'];
+  const headerTitles = ['Datum', 'Team', 'Resultat', 'Sätze'];
   const thead = table.createTHead();
 
   for (let title of headerTitles) {
     let th = document.createElement('th');
     th.className = title.toLowerCase().replace(' ', '');
 
-    if (title.startsWith('Satz')) th.className = `satz ${ title.toLowerCase().replace(' ', '') }`;
+    if (title.startsWith('Sätze')) {
+      th.className = `satz ${ title.toLowerCase().replace(' ', '') }`;
+      th.colSpan = 5;
+    }
 
     let text = document.createTextNode(title);
     th.appendChild(text);
